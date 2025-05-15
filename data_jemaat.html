@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Data Jemaat Berdasarkan Kepala Keluarga</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .kk-item { cursor: pointer; padding: 8px; background: #f2f2f2; border: 1px solid #ccc; margin-bottom: 5px; border-radius: 5px; }
+    .anggota { margin-left: 20px; padding: 10px; background: #e9f7ef; border-radius: 5px; margin-bottom: 5px; }
+    .hidden { display: none; }
+    input, select { margin-top: 5px; padding: 4px; width: 90%; }
+    button { margin-top: 5px; padding: 5px 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Data Jemaat Berdasarkan Kepala Keluarga</h2>
+<div id="kkContainer"></div>
+
+<script>
+const apiUrl = "https://script.google.com/macros/s/AKfycbxlZX4Y-LadLV_Gc_wM4ops7-a_FbB4omb6Z7DgjrP9Y_O73cbWChVugH0YRT9ElncN/exec"; // Ganti dengan URL Web App kamu
+
+fetch(apiUrl)
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("kkContainer");
+
+    Object.keys(data).forEach(kk => {
+      const kkDiv = document.createElement("div");
+      kkDiv.className = "kk-item";
+      kkDiv.textContent = kk;
+      kkDiv.onclick = () => anggotaDiv.classList.toggle("hidden");
+
+      const anggotaDiv = document.createElement("div");
+      anggotaDiv.className = "hidden";
+
+      data[kk].forEach(anggota => {
+        const a = document.createElement("div");
+        a.className = "anggota";
+
+        const nameInput = document.createElement("input");
+        nameInput.value = anggota["Nama Anggota"];
+
+        const umurInput = document.createElement("input");
+        umurInput.value = anggota["Umur"];
+        umurInput.type = "number";
+
+        const statusInput = document.createElement("input");
+        statusInput.value = anggota["Status"];
+
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "Simpan";
+        saveBtn.onclick = () => {
+          fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: anggota.id,
+              "Nama Anggota": nameInput.value,
+              "Umur": umurInput.value,
+              "Status": statusInput.value
+            })
+          })
+          .then(r => r.text())
+          .then(msg => alert("✅ " + msg));
+        };
+
+        a.appendChild(nameInput);
+        a.appendChild(umurInput);
+        a.appendChild(statusInput);
+        a.appendChild(saveBtn);
+        anggotaDiv.appendChild(a);
+      });
+
+      container.appendChild(kkDiv);
+      container.appendChild(anggotaDiv);
+    });
+  });
+</script>
+
+</body>
+</html>
